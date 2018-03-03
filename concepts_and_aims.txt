@@ -1,0 +1,12 @@
+Concepts and Aims for Snilcoin
+
+Programming language: Java
+
+P2P Network Structure: Unsorted
+
+Communication protocol: UDP IPv4 
+                                               Maybe later additional IPv6 support
+
+Hash Algorithm: SHA265
+
+Blocksize: To Dd
