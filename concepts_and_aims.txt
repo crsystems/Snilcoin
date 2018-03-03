@@ -10,3 +10,13 @@ Communication protocol: UDP IPv4
 Hash Algorithm: SHA265
 
 Blocksize: To Dd
+
+
+Important ressources:
+
+https://en.wikipedia.org/wiki/Cryptocurrency
+https://en.wikipedia.org/wiki/Peer-to-peer
+https://en.wikipedia.org/wiki/Blockchain#Structure
+https://en.wikipedia.org/wiki/Proof-of-work_system
+https://en.wikipedia.org/wiki/Merkle_tree
+
