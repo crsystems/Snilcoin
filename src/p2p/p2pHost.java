@@ -21,5 +21,14 @@ class p2pHost{
 	public int getPort(){
 		return portnum;
 	}
+
+	public int setAddress(InetAddress ip){
+		address = ip;
+		return 0;
+	}
+
+	public int setPort(int port){
+		portnum = port;
+	}	
 }
 
