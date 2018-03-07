@@ -5,7 +5,7 @@ import java.net.*;
 
 class p2pHost{
 
-	private InetAddress address = new InetAddress;
+	private InetAddress address;
 	private int portnum = 0;
 
 
@@ -29,6 +29,7 @@ class p2pHost{
 
 	public int setPort(int port){
 		portnum = port;
+		return 0;
 	}	
 }
 
