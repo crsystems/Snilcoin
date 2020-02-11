@@ -1,5 +1,5 @@
+package p2p;
 //Class to ease hostmanagement by the p2p class
-
 
 import java.net.*;
 
