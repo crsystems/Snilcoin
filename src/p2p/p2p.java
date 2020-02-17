@@ -28,12 +28,12 @@ public class p2p {
 	}
 
 	// Method for broadcasting ==> sends a byte array to all hosts in the hostlist
-	public int broadcast(byte[] message_bytes)
+	public int broadcast(byte[] message_bytes, int length)
 	{
 		for(int i = 0; i < next_index; i++){
 			try{
-				DatagramPacket msg = new DatagramPacket(message_bytes, message_bytes.length, hostlist[i].getAddress(), hostlist[i].getPort()); 
-				socket.send(msg);
+				DatagramPacket msg = new DatagramPacket(message_bytes, length, hostlist[i].getAddress(), hostlist[i].getPort()); 
+				this.socket.send(msg);
 			}catch(Exception e){
 				return i+1;
 			}
@@ -42,7 +42,8 @@ public class p2p {
 	}
 
 	// Method for synchronizing the hostlist with other known hosts
-	public int sync(){
+	public int sync(DatagramPacket p)
+	{
 		return 0;
 	}
 
@@ -62,6 +63,18 @@ public class p2p {
 		return 0;
 	}
 
+	// Method for removing an unneeded host from the host list
+	public void removeHost(InetAddress ip, int port)
+	{
+		for(int i = 0; i < next_index; i++){
+			if(hostlist[i].getAddress().equals(ip) && hostlist[i].getPort() == port){
+				hostlist[i].setPort(0);
+				break;
+			}
+		}
+		this.sortHostlist();
+	}
+
 
 	// Method for sorting the hostlist
 	// Duplicates are removed and the array ist shrinked to close possible holes
@@ -75,7 +88,7 @@ public class p2p {
 				continue;
 			}else{
 				for(int k = i+1; k < next_index; k++){
-					if(tmp.getAddress().equals(hostlist[k].getAddress())){
+					if(tmp.getAddress().equals(hostlist[k].getAddress()) && tmp.getPort() == hostlist[k].getPort()){
 						hostlist[k].setPort(0);
 					}
 				}

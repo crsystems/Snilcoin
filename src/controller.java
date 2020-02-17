@@ -66,6 +66,16 @@ class controller {
 	{
 		p2p network = new p2p();
 		bootstrap(network);
+
+		String snc = new String("sync");
+		network.broadcast(snc.getBytes(), snc.length());
+		
+
+		while(true){
+
+			//network.sync();
+		}
+
 	}
 
 }
