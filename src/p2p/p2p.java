@@ -12,7 +12,7 @@ public class p2p {
 	
 
 	// Max number if hosts in hostlist
-	private int maxHosts = 100;
+	private int maxHosts = 256;
 	
 	// Next empty entryvariable
 	private int next_index = 0;
@@ -76,6 +76,55 @@ public class p2p {
 				continue;
 			}
 		}
+
+		return 0;
+	}
+
+	public int sendHostlist(DatagramPacket p)
+	{
+		InetAddress req_host = p.getAddress();
+		int port = p.getPort();
+
+		byte hl[] = new byte[(5+6*next_index)];
+		
+		// Setup response byte
+		hl[0] = (byte) 2;
+
+		int length = 6*next_index;
+		ByteBuffer l = ByteBuffer.allocate(4);
+		l.putInt(length);
+		hl[1] = l.get(0);
+		hl[2] = l.get(1);
+		hl[3] = l.get(2);
+		hl[4] = l.get(3);
+
+		for(int i = 0; i < next_index; i++){
+			int offset = 5 + i*6;
+
+			p2pHost tmp = hostlist[i];
+			byte addr[] = tmp.getAddress().getAddress();
+			ByteBuffer prt = ByteBuffer.allocate(4);
+			prt.putInt(tmp.getPort());
+
+			hl[offset] 	= addr[0];
+			hl[offset + 1]	= addr[1];
+			hl[offset + 2]	= addr[2];
+			hl[offset + 3]	= addr[3];
+			hl[offset + 4]	= prt.get(2);
+			hl[offset + 5] 	= prt.get(3);
+		}
+
+		DatagramPacket brd = new DatagramPacket(hl, (5+6*next_index), req_host, port);
+
+		try{
+			socket.send(brd);
+			System.out.println("Sent packet to port: " + port + " of lenth " + (5+6*next_index));
+		}catch(Exception e){
+			System.out.println("Could not broadcast the hostlist! " + e.getMessage());
+		}
+
+
+		this.addHost(req_host, port);
 
 		return 0;
 	}

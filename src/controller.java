@@ -65,14 +65,21 @@ class controller {
 
 	public static void main(String args[]) throws IOException, SocketException, UnknownHostException
 	{
-
-		DatagramSocket sock = new DatagramSocket(5432, InetAddress.getByName("0.0.0.0"));
+		DatagramSocket sock = new DatagramSocket(Integer.decode(args[0]), InetAddress.getByName("0.0.0.0"));
 
 		p2p network = new p2p(sock);
 		bootstrap(network);
 
-		String snc = new String("sync");
-		network.broadcast(snc.getBytes(), snc.length());
+
+		// Generate sync request message
+		byte snc[] = new byte[5];
+		snc[0] = (byte) 1;
+		for(int i = 1; i < 5;i++){
+			snc[i] = (byte) 0;
+		}
+
+		// Broadcast sync request
+		network.broadcast(snc, 5);
 		
 		// Byte buffer for incoming packets
 		// 1541 bytes = packet header + 256 hostlist entries
@@ -84,9 +91,10 @@ class controller {
 			sock.receive(pckt);
 
 			switch((int) pckt_buf[0]){
-				case 1: network.sync(pckt);
+				case 1: network.sendHostlist(pckt);
 					continue;
-
+				case 2: network.sync(pckt);
+					continue;
 				default:
 					break;
 			}
