@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 
 import p2p.*;
 
@@ -62,18 +63,33 @@ class controller {
 		return;
 	}
 
-	public static void main(String args[]) throws SocketException, UnknownHostException
+	public static void main(String args[]) throws IOException, SocketException, UnknownHostException
 	{
-		p2p network = new p2p();
+
+		DatagramSocket sock = new DatagramSocket(5432, InetAddress.getByName("0.0.0.0"));
+
+		p2p network = new p2p(sock);
 		bootstrap(network);
 
 		String snc = new String("sync");
 		network.broadcast(snc.getBytes(), snc.length());
 		
+		// Byte buffer for incoming packets
+		// 1541 bytes = packet header + 256 hostlist entries
+		byte pckt_buf[] = new byte[1541];
+
+		DatagramPacket pckt = new DatagramPacket(pckt_buf, 1541);
 
 		while(true){
+			sock.receive(pckt);
 
-			//network.sync();
+			switch((int) pckt_buf[0]){
+				case 1: network.sync(pckt);
+					continue;
+
+				default:
+					break;
+			}
 		}
 
 	}

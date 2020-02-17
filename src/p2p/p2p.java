@@ -4,6 +4,7 @@ package p2p;
 
 import java.net.*;
 import java.io.*;
+import java.nio.ByteBuffer;
 import p2p.p2pHost.*;
 
 
@@ -22,9 +23,9 @@ public class p2p {
 
 	// Constructor
 	// Creates the UDP socket
-	public p2p() throws SocketException, UnknownHostException{
+	public p2p(DatagramSocket s) throws SocketException, UnknownHostException{
 		hostlist = new p2pHost[maxHosts];
-		socket = new DatagramSocket(9876, InetAddress.getByName("0.0.0.0"));
+		socket = s;
 	}
 
 	// Method for broadcasting ==> sends a byte array to all hosts in the hostlist
@@ -43,7 +44,39 @@ public class p2p {
 
 	// Method for synchronizing the hostlist with other known hosts
 	public int sync(DatagramPacket p)
-	{
+	{	
+		byte data[] = p.getData();
+
+		ByteBuffer l_buf = ByteBuffer.allocate(4);
+		l_buf.put(data, 1, 4);
+		int length = l_buf.getInt(0);
+
+		if((length % 6) != 0){
+			System.out.println("Host data malformed! Aborting execution");
+			return -1;
+		}
+		
+		for(int i = 5; i < length; i+= 6){
+			byte addr[] = new byte[4];
+			addr[0] = data[i];
+			addr[1] = data[i+1];
+			addr[2] = data[i+2];
+			addr[3] = data[i+3];
+
+			ByteBuffer port = ByteBuffer.allocate(4);
+			port.put((byte) 0);
+			port.put((byte) 0);
+			port.put(data[i+4]);
+			port.put(data[i+5]);
+
+			try{
+				this.addHost(InetAddress.getByAddress(addr), port.getInt(0));
+			}catch(Exception e){
+				System.out.println("Encountered error while adding new host: " + e.getMessage());
+				continue;
+			}
+		}
+
 		return 0;
 	}
 
